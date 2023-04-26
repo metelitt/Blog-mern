@@ -1,11 +1,9 @@
 import express from "express"
-import bcrypt from "bcrypt"
-import {validationResult} from 'express-validator'
 import mongoose from 'mongoose'
-import { registerValidation } from "./validations/auth.js";
-
-import userModel from "./modules/User.js"
-
+import { registerValidation,loginValidation, postCreateValidations } from "./validations.js";
+import checkAuth from './utils/chechAuth.js'
+import * as UserControllers from './controllers/UserControllers.js'
+import * as PostController from './controllers/PostController.js'
 mongoose
   .connect('mongodb+srv://user:111@cluster0.2y2i8vy.mongodb.net/blog?retryWrites=true&w=majority')
   .then(()=>console.log('DB OK'))
@@ -13,35 +11,17 @@ mongoose
 const app=express()
 app.use(express.json())
 
+app.post('/auth/login',loginValidation,UserControllers.login)
+app.post('/auth/register',registerValidation,UserControllers.register)
+app.get('/auth/me',checkAuth,UserControllers.getMe)
 
-app.post('/auth/register',registerValidation,async(req,res)=>{
- try{
-  const errors=validationResult(req)
-  if(!errors.isEmpty()){
-    return res.status(400).json(errors.array())
-  }
 
-  const password=req.body.password;
-  const salt=await bcrypt.genSalt(10)
-  const passwordHash=await bcrypt.hash(password,salt)
-  const doc= new userModel({
-    email:req.body.email,
-    fullName:req.body.fullName,
-    avatarUrl:req.body.avatarUrl,
-    passwordHash
-  })
+app.get('/posts',PostController.getAll)
+app.get('/posts/:id',PostController.getOne)
+app.post('/posts',checkAuth,postCreateValidations,PostController.create)
+app.delete('/posts/:id',checkAuth,PostController.remove)
+app.patch('/posts/:id',checkAuth,PostController.patch)
 
-  const user= await doc.save()
-
-  res.json(user)
-
- }catch(err){
-  console.log(err);
-    res.status(500).json({
-      message:"Не удалось зарегестрироваться",
-    })
- }
-})
 
 app.listen(4444,(err)=>{{
 if(err){
