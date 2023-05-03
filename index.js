@@ -7,7 +7,7 @@ import {handleErrors,checkAuth} from './utils/index.js'
 import {UserControllers,PostController} from './controllers/index.js'
 
 mongoose
-  .connect('mongodb+srv://user:111@cluster0.2y2i8vy.mongodb.net/blog?retryWrites=true&w=majority')
+  .connect('mongodb+srv://user:111@cluster0.2y2i8vy.mongodb.net/?retryWrites=true&w=majority')
   .then(()=>console.log('DB OK'))
   .catch((err)=>console.log('DB error',err))
 
