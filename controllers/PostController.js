@@ -25,7 +25,7 @@ export const getOne = async (req,res)=>{
       {
         returnDocument: 'after',
       }
-    )
+    ).populate('user')
       .then((doc) => {
         res.json(doc);
       })
@@ -46,7 +46,7 @@ const doc=new PostModel({
     title:req.body.title,
     text:req.body.text,
     imageUrl:req.body.imageUrl,
-    tags:req.body.tags,
+    tags:req.body.tags.split(',') ,
     user:req.userId,
 })
 const post = await doc.save()
@@ -84,7 +84,7 @@ export const patch = async (req,res)=>{
     title:req.body.title,
     text:req.body.text,
     imageUrl:req.body.imageUrl,
-    tags:req.body.tags,
+    tags:req.body.tags.tags.split(','),
     user:req.userId,
     }).then(() => {
       res.json({
